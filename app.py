@@ -1,16 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import requests
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "frontendsecret"
 
-# URL del backend Flask (ajusta si usas Railway u otro host)
-BACKEND_URL = os.getenv("BACKEND_URL", "https://motosapi-production.up.railway.app")
+# URL del backend en Railway
+BACKEND_URL = "https://motosapi-production.up.railway.app"
 
+# ------------------ HOME ------------------
 @app.route("/")
 def home():
     if "email" in session:
@@ -65,17 +62,26 @@ def dashboard():
         return redirect(url_for("login"))
 
     try:
-        response = requests.get(f"{BACKEND_URL}/motorcycles/tabla")
+        # Pedimos JSON de motos al backend
+        response = requests.get(f"{BACKEND_URL}/motorcycles")
         if response.status_code == 200:
-            html_table = response.text
+            motos = response.json()  # lista de diccionarios
         else:
-            html_table = "<p>Error al cargar la base de datos.</p>"
+            motos = []
+            flash("Error al cargar las motos.", "danger")
     except requests.exceptions.RequestException:
-        html_table = "<p>No se pudo conectar al backend.</p>"
+        motos = []
+        flash("No se pudo conectar al backend.", "danger")
 
-    return render_template("users.html", email=session["email"], table=html_table)
+    return render_template("users.html", email=session["email"], motos=motos)
 
 # ------------------ LOGOUT ------------------
 @app.route("/logout")
 def logout():
-    session.p
+    session.pop("email", None)
+    flash("Has cerrado sesión.", "success")
+    return redirect(url_for("login"))
+
+# ------------------ RUN SERVER ------------------
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5001)
