@@ -1,129 +1,81 @@
-import os
-import logging
-from datetime import timedelta
-from logging.handlers import RotatingFileHandler
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from dotenv import load_dotenv
 import requests
+import os
+from dotenv import load_dotenv
 
-# --- Configuración base ---
 load_dotenv()
 
-API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:5000")
-SECRET_KEY = os.getenv("SECRET_KEY", "frontendsecret123")
-LOG_FILE = os.getenv("LOG_FILE", "frontend.log")
-
 app = Flask(__name__)
-app.config["SECRET_KEY"] = SECRET_KEY
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=2)
+app.secret_key = "frontendsecret"
 
-# --- Logging ---
-logger = logging.getLogger("frontend")
-logger.setLevel(logging.INFO)
-fh = RotatingFileHandler(LOG_FILE, maxBytes=5*1024*1024, backupCount=3)
-fh.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
-logger.addHandler(fh)
+# URL del backend Flask (ajusta si usas Railway u otro host)
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:5000")
 
-
-# --- Helpers ---
-def api_get(path, token=None):
-    headers = {}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-    return requests.get(f"{API_BASE_URL}{path}", headers=headers, timeout=10)
-
-
-def api_post(path, json=None):
-    return requests.post(f"{API_BASE_URL}{path}", json=json, timeout=10)
-
-
-# --- Rutas ---
 @app.route("/")
-def index():
-    return render_template("index.html")
+def home():
+    if "email" in session:
+        return redirect(url_for("dashboard"))
+    return redirect(url_for("login"))
 
-
+# ------------------ REGISTRO ------------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-        if not email or not password:
-            flash("Correo y contraseña requeridos", "warning")
-            return redirect(url_for("register"))
+        email = request.form["email"]
+        password = request.form["password"]
 
+        data = {"email": email, "password": password}
         try:
-            res = api_post("/register", {"email": email, "password": password})
-            if res.status_code in (200, 201):
-                flash("Registro exitoso. Ahora inicia sesión.", "success")
+            response = requests.post(f"{BACKEND_URL}/register", json=data)
+            if response.status_code == 201:
+                flash("Usuario registrado exitosamente, ahora inicia sesión.", "success")
                 return redirect(url_for("login"))
+            elif response.status_code == 409:
+                flash("El correo ya está registrado.", "warning")
             else:
-                flash("Error al registrarse", "danger")
-        except Exception as e:
-            flash("Error conectando con el servidor", "danger")
-            logger.exception(e)
-
+                flash("Error al registrar usuario.", "danger")
+        except requests.exceptions.RequestException:
+            flash("Error de conexión con el backend.", "danger")
     return render_template("register.html")
 
-
+# ------------------ LOGIN ------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+        email = request.form["email"]
+        password = request.form["password"]
 
+        data = {"email": email, "password": password}
         try:
-            res = api_post("/login", {"email": email, "password": password})
-            if res.status_code == 200:
-                data = res.json()
-                token = data.get("token") or data.get("access_token")
-                if token:
-                    session["token"] = token
-                    flash("Inicio de sesión exitoso", "success")
-                    return redirect(url_for("motos"))
-                else:
-                    flash("El servidor no devolvió token", "danger")
+            response = requests.post(f"{BACKEND_URL}/login", json=data)
+            if response.status_code == 200:
+                session["email"] = email
+                flash("Inicio de sesión exitoso.", "success")
+                return redirect(url_for("dashboard"))
             else:
-                flash("Credenciales inválidas", "danger")
-        except Exception as e:
-            flash("Error conectando con el backend", "danger")
-            logger.exception(e)
-
+                flash("Credenciales incorrectas.", "danger")
+        except requests.exceptions.RequestException:
+            flash("Error de conexión con el backend.", "danger")
     return render_template("login.html")
 
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    flash("Sesión cerrada", "info")
-    return redirect(url_for("index"))
-
-
-@app.route("/motos")
-def motos():
-    token = session.get("token")
-    if not token:
-        flash("Inicia sesión para ver la base de datos.", "warning")
+# ------------------ DASHBOARD ------------------
+@app.route("/dashboard")
+def dashboard():
+    if "email" not in session:
         return redirect(url_for("login"))
 
     try:
-        res = api_get("/motorcycles/tabla", token)
-        if res.status_code == 200:
-            return res.text  # la tabla HTML generada por el backend
+        response = requests.get(f"{BACKEND_URL}/motorcycles/tabla")
+        if response.status_code == 200:
+            html_table = response.text
         else:
-            flash("No se pudo cargar la tabla de motos.", "danger")
-            return redirect(url_for("index"))
-    except Exception as e:
-        logger.exception(e)
-        flash("Error al conectar con el backend.", "danger")
-        return redirect(url_for("index"))
+            html_table = "<p>Error al cargar la base de datos.</p>"
+    except requests.exceptions.RequestException:
+        html_table = "<p>No se pudo conectar al backend.</p>"
 
+    return render_template("users.html", email=session["email"], table=html_table)
 
-# --- Health check ---
-@app.route("/health")
-def health():
-    return {"status": "ok"}
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+# ------------------ LOGOUT ------------------
+@app.route("/logout")
+def logout():
+    session.p
