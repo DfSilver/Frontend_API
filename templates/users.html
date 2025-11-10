@@ -2,52 +2,51 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Motos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Lista de Motocicletas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
 </head>
-<body class="bg-light">
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Bienvenido, {{ email }}</h1>
-        <a href="{{ url_for('logout') }}" class="btn btn-danger">Cerrar sesión</a>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">MotosAPI</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <span class="navbar-text text-light me-3">Hola, {{ email }}</span>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-light" href="{{ url_for('logout') }}">Cerrar sesión</a>
+                </li>
+            </ul>
+        </div>
     </div>
+</nav>
+
+<div class="container mt-4">
+    <h3>Lista de Motocicletas</h3>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ 'success' if category=='success' else 'warning' if category=='warning' else 'danger' }}">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show mt-2" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
     {% endwith %}
 
-    <h3>Lista de Motocicletas</h3>
     <div class="table-responsive mt-3">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Marca</th>
-                    <th>Modelo</th>
-                    <th>Año</th>
-                    <th>Precio</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for moto in motos %}
-                <tr>
-                    <td>{{ moto.id }}</td>
-                    <td>{{ moto.brand }}</td>
-                    <td>{{ moto.model }}</td>
-                    <td>{{ moto.year }}</td>
-                    <td>{{ moto.price }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% if motos_html %}
+            {{ motos_html|safe }}
+        {% else %}
+            <p>No hay motocicletas disponibles.</p>
+        {% endif %}
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
