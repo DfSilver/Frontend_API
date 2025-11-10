@@ -2,32 +2,42 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Frontend Motos{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motos API - Frontend</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
 </head>
 <body>
-<nav>
-    <a href="{{ url_for('index') }}">Inicio</a>
-    {% if session.get('token') %}
-        <a href="{{ url_for('motos') }}">Ver Motos</a>
-        <a href="{{ url_for('logout') }}">Cerrar sesión</a>
-    {% else %}
-        <a href="{{ url_for('login') }}">Iniciar sesión</a>
-        <a href="{{ url_for('register') }}">Registrarse</a>
-    {% endif %}
-</nav>
-
-<div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <ul class="flashes">
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
+    <nav class="navbar">
+        <div class="container">
+            <h1><a href="/">🏍️ MotosApp</a></h1>
+            <ul>
+                {% if session.get("email") %}
+                    <li><a href="{{ url_for('dashboard') }}">Base de datos</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Iniciar sesión</a></li>
+                    <li><a href="{{ url_for('register') }}">Registrarse</a></li>
+                {% endif %}
             </ul>
-        {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
-</div>
+        </div>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+          {% if messages %}
+            <div class="flash-container">
+              {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2025 MotosApp | Proyecto Flask + SQLite</p>
+    </footer>
 </body>
 </html>

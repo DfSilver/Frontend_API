@@ -1,9 +1,15 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Listado de Motos</h2>
+<div class="container">
+    <h2>Base de Datos de Motocicletas</h2>
+    <p>Bienvenido, <strong>{{ email }}</strong> 👋</p>
+    <hr>
 
-<div class="motorcycles">
-    {{ motorcycles_table | safe }}
+    <div class="table-container">
+        {{ table|safe }}
+    </div>
+
+    <br>
+    <a href="{{ url_for('logout') }}" class="logout-btn">Cerrar sesión</a>
 </div>
 {% endblock %}
-

@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = "frontendsecret"
 
 # URL del backend Flask (ajusta si usas Railway u otro host)
-BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:5000")
+BACKEND_URL = os.getenv("BACKEND_URL", "https://motosapi-production.up.railway.app")
 
 @app.route("/")
 def home():

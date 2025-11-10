@@ -1,80 +1,112 @@
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f4f6f8;
-    margin: 0;
-    padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f7f7f7;
+  color: #333;
+  margin: 0;
+  padding: 0;
 }
 
 .navbar {
-    background-color: #222;
-    color: white;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: #1e1e2f;
+  color: white;
+  padding: 10px 20px;
+}
+
+.navbar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
 }
 
 .navbar a {
-    color: white;
-    text-decoration: none;
-    margin-left: 15px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
 }
 
 .container {
-    max-width: 600px;
-    margin: 80px auto;
-    background: white;
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  background: white;
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
 }
 
-h2 {
-    text-align: center;
-    color: #222;
+.container h2 {
+  text-align: center;
 }
 
 form {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 input {
-    margin: 10px 0;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 button {
-    background-color: #222;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    cursor: pointer;
+  padding: 10px;
+  background-color: #3a57e8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 button:hover {
-    background-color: #444;
+  background-color: #2a47d8;
+}
+
+.flash-container {
+  max-width: 700px;
+  margin: 20px auto;
 }
 
 .flash {
-    background-color: #ffe082;
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    text-align: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  font-weight: 600;
 }
 
-.motorcycles {
-    margin-top: 30px;
+.flash.success { background: #c8f7c5; color: #2c662d; }
+.flash.warning { background: #fff3cd; color: #856404; }
+.flash.danger  { background: #f8d7da; color: #721c24; }
+.flash.info    { background: #cce5ff; color: #004085; }
+
+.table-container {
+  overflow-x: auto;
+  background: #fafafa;
+  padding: 10px;
+  border-radius: 8px;
 }
 
-.logout {
-    background-color: crimson;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 5px;
-    text-decoration: none;
+.logout-btn {
+  display: inline-block;
+  background: #e43f5a;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.logout-btn:hover {
+  background: #c02740;
 }
