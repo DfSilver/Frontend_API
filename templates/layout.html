@@ -2,32 +2,32 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title if title else "Frontend API" }}</title>
+    <title>{% block title %}Frontend Motos{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
 </head>
 <body>
-    <div class="navbar">
-        <div>
-            <a href="/">🏍️ Motorcycles API</a>
-        </div>
-        {% if session.get('username') %}
-            <div>
-                <span>👋 {{ session['username'] }}</span>
-                <a class="logout" href="{{ url_for('logout') }}">Salir</a>
-            </div>
-        {% endif %}
-    </div>
+<nav>
+    <a href="{{ url_for('index') }}">Inicio</a>
+    {% if session.get('token') %}
+        <a href="{{ url_for('motos') }}">Ver Motos</a>
+        <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+    {% else %}
+        <a href="{{ url_for('login') }}">Iniciar sesión</a>
+        <a href="{{ url_for('register') }}">Registrarse</a>
+    {% endif %}
+</nav>
 
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
                 {% for category, message in messages %}
-                    <div class="flash">{{ message }}</div>
+                    <li class="{{ category }}">{{ message }}</li>
                 {% endfor %}
-            {% endif %}
-        {% endwith %}
-        {% block content %}{% endblock %}
-    </div>
+            </ul>
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</div>
 </body>
 </html>

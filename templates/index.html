@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+<h1>Bienvenido al Sistema de Motos</h1>
+<p>Consulta la base de datos de motocicletas del backend Flask.</p>
+{% if not session.get('token') %}
+    <a href="{{ url_for('login') }}">Iniciar Sesión</a> |
+    <a href="{{ url_for('register') }}">Registrarse</a>
+{% else %}
+    <a href="{{ url_for('motos') }}">Ver Motos</a>
+{% endif %}
+{% endblock %}
