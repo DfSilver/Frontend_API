@@ -1,6 +1,49 @@
 body {
-  background: linear-gradient(180deg, #f7f9fc 0%, #e8f0f7 100%);
+    font-family: Arial, sans-serif;
+    margin: 30px;
+    background: #fafafa;
 }
-.card {
-  border-radius: 12px;
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+nav a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+.flashes {
+    list-style-type: none;
+    padding: 0;
+}
+
+.flashes li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.success { background-color: #d4edda; }
+.warning { background-color: #fff3cd; }
+.danger { background-color: #f8d7da; }
+.info { background-color: #d1ecf1; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
 }

@@ -1,26 +1,25 @@
 {% extends "layout.html" %}
+{% block title %}Usuarios{% endblock %}
 {% block content %}
-<div class="card shadow-sm">
-  <div class="card-body">
-    <h3 class="card-title mb-3">Usuarios</h3>
-    {% if users %}
-      <table class="table table-striped">
-        <thead>
-          <tr><th>ID</th><th>Email</th><th>Role</th></tr>
-        </thead>
-        <tbody>
-          {% for u in users %}
-            <tr>
-              <td>{{ u.get('id') }}</td>
-              <td>{{ u.get('email') }}</td>
-              <td>{{ u.get('role') }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p>No se encontraron usuarios.</p>
-    {% endif %}
-  </div>
-</div>
+<h2>Lista de Usuarios</h2>
+{% if users %}
+<table>
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Rol</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.email or user['email'] }}</td>
+            <td>{{ user.role or user['role'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No se encontraron usuarios.</p>
+{% endif %}
 {% endblock %}
