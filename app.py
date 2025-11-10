@@ -77,3 +77,93 @@ def register():
     role = request.form.get("role", "user")
 
     if not email or not password:
+        flash("Email y contraseña son obligatorios", "warning")
+        return redirect(url_for("register"))
+
+    try:
+        resp = api_post("/register", json={"email": email, "password": password, "role": role})
+        if resp.status_code in (200, 201):
+            flash("Registro exitoso. Inicia sesión ahora.", "success")
+            return redirect(url_for("login"))
+        else:
+            flash(f"Error en registro: {resp.json().get('error', 'Intenta nuevamente')}", "danger")
+            return redirect(url_for("register"))
+    except Exception as e:
+        logger.exception("Error registrando usuario")
+        flash("Error de conexión con el servidor", "danger")
+        return redirect(url_for("register"))
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    if not email or not password:
+        flash("Email y contraseña son requeridos", "warning")
+        return redirect(url_for("login"))
+
+    try:
+        resp = api_post("/login", json={"email": email, "password": password})
+        if resp.status_code == 200:
+            data = resp.json()
+            token = data.get("token") or data.get("access_token") or data.get("accessToken")
+            if not token:
+                flash("El servidor no devolvió un token válido", "danger")
+                return redirect(url_for("login"))
+
+            session.permanent = True
+            session["token"] = token
+            flash("Inicio de sesión exitoso", "success")
+            return redirect(url_for("users"))
+        else:
+            flash("Credenciales inválidas", "danger")
+            return redirect(url_for("login"))
+    except Exception:
+        logger.exception("Error durante la autenticación")
+        flash("Error de conexión con el servidor", "danger")
+        return redirect(url_for("login"))
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("Sesión cerrada correctamente", "info")
+    return redirect(url_for("login"))
+
+
+@app.route("/users")
+def users():
+    token = session.get("token")
+    if not token:
+        return redirect(url_for("login"))
+
+    try:
+        resp = api_get("/users", token=token)
+        if resp.status_code == 200:
+            users_list = resp.json()
+            return render_template("users.html", users=users_list)
+        elif resp.status_code == 401:
+            flash("Token expirado o inválido. Vuelve a iniciar sesión.", "warning")
+            session.clear()
+            return redirect(url_for("login"))
+        else:
+            flash("Error al obtener usuarios", "danger")
+            return render_template("users.html", users=[])
+    except Exception:
+        logger.exception("Error al comunicarse con la API")
+        flash("Error de conexión con el servidor", "danger")
+        return render_template("users.html", users=[])
+
+
+@app.route("/health")
+def health():
+    return {"status": "ok"}, 200
+
+
+# --- Run ---
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=3000, debug=False)
